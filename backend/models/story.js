@@ -1,8 +1,6 @@
 // story.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from './index.js'; // Sesuaikan dengan instance Sequelize Anda
-import { Chapter } from './chapter.js';
-import { Tag } from './tag.js';
 
 const Story = sequelize.define('Story', {
     title: {

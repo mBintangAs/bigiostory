@@ -1,4 +1,3 @@
-// Category.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from './index.js';
 
@@ -11,6 +10,5 @@ const Category = sequelize.define('Category', {
 }
 );
 
-// Definisikan relasi dengan model "Story" (one-to-many)
 
 export { Category };

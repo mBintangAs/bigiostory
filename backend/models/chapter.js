@@ -1,4 +1,3 @@
-// chapter.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from './index.js'; // Sesuaikan dengan instance Sequelize Anda
 
@@ -11,7 +10,6 @@ const Chapter = sequelize.define('Chapter', {
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    // Menambahkan foreign key untuk merujuk ke model "Story"
     storyId: {
         type: DataTypes.INTEGER,
         allowNull: false,

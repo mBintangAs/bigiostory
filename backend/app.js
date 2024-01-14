@@ -6,9 +6,12 @@ import { Story } from './models/story.js'
 import { Tag } from './models/tag.js'
 import { Chapter } from './models/chapter.js'
 import { Category } from './models/category.js'
-
+import bodyParser from 'body-parser';
+import cors from 'cors';
 
 const app = Express()
+app.use(bodyParser.json());
+app.use(cors());
 
 app.use(storyRouter)
 
@@ -21,7 +24,6 @@ try {
     Story.belongsTo(Category)
     Story.hasMany(Tag)
     Tag.belongsTo(Story)
-
 } catch (error) {
 
 }
