@@ -61,7 +61,7 @@ export const store = async (req, res) => {
       const storyTags = tags.map(tagName => ({ name: tagName, storyId: newStory.id }));
       await Tag.bulkCreate(storyTags);
     }
-    return res.json({ message: "Data berhasil disimpan" })
+    return res.json({ message: "Data berhasil disimpan" });
 
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
@@ -69,8 +69,8 @@ export const store = async (req, res) => {
 };
 export const update = async (req, res) => {
   try {
-    const { title, author, synopsis, storyCover, status, categoryId, tags } = req.body;
-
+    const { id, title, author, synopsis, storyCover, status, categoryId, tags } = req.body;
+    
     const newStory = await Story.update({
       title,
       author,
@@ -78,7 +78,7 @@ export const update = async (req, res) => {
       storyCover,
       status,
       categoryId,
-    });
+    }, { where: { id } });
 
     if (tags && tags.length > 0) {
       const storyTags = tags.map(tagName => ({ name: tagName, storyId: newStory.id }));
@@ -93,13 +93,12 @@ export const update = async (req, res) => {
 
 export const destroy = async (req, res) => {
   try {
-    const { categoryId } = req.body;
-    await Chapter.destroy({ categoryId });
-    await Story.destroy({ id: categoryId })
-    return res.json({ message: "Data berhasil dihapus" })
+    const { id } = req.body;
+    await Chapter.destroy({ categoryId: id });
+    await Story.destroy({ id });
+    return res.json({ message: "Data berhasil dihapus" });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
-
   }
 }
 

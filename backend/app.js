@@ -6,6 +6,7 @@ import { Story } from './models/story.js'
 import { Tag } from './models/tag.js'
 import { Chapter } from './models/chapter.js'
 import { Category } from './models/category.js'
+import { chapterRouter } from './routes/chapter.js'
 import bodyParser from 'body-parser';
 import cors from 'cors';
 
@@ -14,6 +15,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 app.use(storyRouter)
+app.use(chapterRouter)
 
 app.listen(process.env.APP_PORT, () => {
     console.log(`Example app listening on port ${process.env.APP_PORT}`)
@@ -25,5 +27,5 @@ try {
     Story.hasMany(Tag)
     Tag.belongsTo(Story)
 } catch (error) {
-
+    console.error(error)
 }
