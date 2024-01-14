@@ -16,7 +16,7 @@ const Chapter = sequelize.define('Chapter', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Story',
+            model: 'Stories',
             key: 'id',
         },
     },

@@ -2,6 +2,10 @@ import Express from 'express'
 import 'dotenv/config'
 import { storyRouter } from './routes/story.js'
 import { sequelize } from './models/index.js'
+import { Story } from './models/story.js'
+import { Tag } from './models/tag.js'
+import { Chapter } from './models/chapter.js'
+import { Category } from './models/category.js'
 
 
 const app = Express()
@@ -13,17 +17,11 @@ app.listen(process.env.APP_PORT, () => {
 })
 try {
     await sequelize.authenticate();
-    // Definisikan relasi dengan model "Story" (many-to-one)
-    // const story = Story;
-    // const tag = Tag;
-    // const chapter = Chapter;
-    // const storyTag=StoryTag;
-    // story.hasMany(chapter, { as: 'chapters' });
-    // story.belongsToMany(tag, { through: 'StoryTag', as: 'tags' });
-    // chapter.belongsTo(story, { foreignKey: 'storyId', as: 'story' });
-    // tag.belongsToMany(story, { through: 'StoryTag', as: 'stories' });
-   
-    // await sequelize.sync({force:true});
+    Category.hasMany(Story)
+    Story.belongsTo(Category)
+    Story.hasMany(Tag)
+    Tag.belongsTo(Story)
+
 } catch (error) {
 
 }

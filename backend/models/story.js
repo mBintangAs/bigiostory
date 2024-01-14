@@ -17,10 +17,7 @@ const Story = sequelize.define('Story', {
         type: DataTypes.TEXT,
         allowNull: false,
     },
-    category: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
+  
     storyCover: {
         type: DataTypes.STRING, // Gunakan tipe data yang sesuai untuk menyimpan path/gambar
         allowNull: false,
@@ -33,7 +30,7 @@ const Story = sequelize.define('Story', {
         type: DataTypes.INTEGER,
         allowNull: false,
         references: {
-            model: 'Category',
+        model: 'Categories',
             key: 'id',
         },
     },

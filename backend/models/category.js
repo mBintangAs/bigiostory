@@ -8,8 +8,8 @@ const Category = sequelize.define('Category', {
     allowNull: false,
     unique: true,
   },
-  
-});
+}
+);
 
 // Definisikan relasi dengan model "Story" (one-to-many)
 
