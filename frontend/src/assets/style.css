@@ -299,3 +299,10 @@ input[type="number"] {
 .bg-gray {
     background-color: var(--light);
 }
+a{
+    text-decoration: none;
+}
+
+.h-100{
+    height: 100px;
+}

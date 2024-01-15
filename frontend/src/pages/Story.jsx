@@ -2,65 +2,63 @@ import axios from "axios";
 import { useEffect, useState } from "react"
 import { NavLink, useOutletContext } from "react-router-dom"
 import Spinner from "../partials/Spinner";
-import { MySwal } from "../main";
+import { MySwal, deleteData, fetchData } from "../main";
 
 export default function Story() {
-    const [isLoad, setIsLoad] = useState(true)
+    const [isLoad, setIsLoad] = useOutletContext()
     const [query, setQuery] = useState('');
     const [cerita, setCerita] = useState([])
     const [category, setCategory] = useState([]);
     const [categoryFilter, setCategoryFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
 
-    const fetchData = async (url, setDataCallback) => {
-        try {
-            const response = await axios.get(url);
-            setDataCallback(response.data);
-            setIsLoad(false);
-        } catch (error) {
-            console.error(error);
-            MySwal.fire({
-                title: 'Something went wrong!',
-                icon: 'error',
-                confirmButtonColor: '#3085d6',
-                confirmButtonText: 'Ok'
-            });
-        }
-    };
 
     useEffect(() => {
-        fetchData('/story', setCerita);
-        fetchData('/category', setCategory);
+        const load = async () => {
+            await fetchData('/story', setCerita);
+            await fetchData('/category', setCategory);
+            setIsLoad(false)
+        }
+        load()
     }, []);
 
     useEffect(() => {
-        const delayFetch = setTimeout(() => {
+        const search = async () => {
+            setIsLoad(true);
             if (query !== '') {
-                setIsLoad(true);
                 if (categoryFilter || statusFilter) {
-                    fetchData(`/story?query=${query}&category=${category}&status=${statusFilter}`, setCerita);
+                    await fetchData(`/story?query=${query}&category=${category}&status=${statusFilter}`, setCerita);
                 } else {
-                    fetchData(`/story?query=${query}`, setCerita);
+                    await fetchData(`/story?query=${query}`, setCerita);
                 }
             } else {
-                setIsLoad(false);
                 if (categoryFilter || statusFilter) {
-                    fetchData(`/story?query=${query}&category=${category}&status=${statusFilter}`, setCerita);
+                    await fetchData(`/story?query=${query}&category=${category}&status=${statusFilter}`, setCerita);
+                } else {
+                    await fetchData(`/story`, setCerita);
+
                 }
             }
-        }, 1000);
-
-        // Cleanup function to clear timeout on component unmount or query change
+            setIsLoad(false)
+        }
+        search()
     }, [query]);
 
-    const search = (event) => {
-        const queryValue = event.target.value;
-        setQuery(queryValue);
-    };
+
     const filter = () => {
         fetchData(`/story?query=${query}&category=${categoryFilter}&status=${statusFilter}`, setCerita);
     }
-
+    const hapus = async (id) => {
+        console.log(id);
+        await deleteData('/story?id=' + id, async (item) => {
+            MySwal.fire({
+                title: item.message,
+                icon: "success",
+                showConfirmButton: true
+            })
+            await fetchData('/story', setCerita)
+        })
+    }
 
     return (
         <>
@@ -110,12 +108,12 @@ export default function Story() {
                             <h6 className="mb-4">List Cerita</h6>
                             <div className="d-flex gap-3">
                                 <div>
-                                    <input type="search" onChange={search} value={query} id="" className="form-control" placeholder="Search by writer's name / title story" />
+                                    <input type="search" onChange={(e) => setQuery(e.target.value)} value={query} id="" className="form-control" placeholder="Search by writer's name / title story" />
                                 </div>
                                 <div className="cursor-pointer" data-bs-toggle="modal" data-bs-target="#filterModal">
                                     <i className="fa-solid fa-filter fs-3 "></i>
                                 </div>
-                                <NavLink to={'/'}>
+                                <NavLink to={'/tambah'}>
                                     <button className="btn btn-sm  btn-secondary text-light" >
                                         Tambah Cerita
                                     </button>
@@ -151,7 +149,15 @@ export default function Story() {
                                             <td>
                                                 <span className="badge rounded-pill bg-secondary m-1">{data.status}</span>
                                             </td>
-                                            <td><i className="fa-solid fa-ellipsis"></i></td>
+                                            <td>
+                                                <i className="fa-solid fa-ellipsis " type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                                                <ul className="dropdown-menu">
+                                                    <li><NavLink to={`/edit/${data.title}`} className="dropdown-item" href="#">Edit</NavLink></li>
+                                                    <li><NavLink to={`/detail/${data.title}`} className="dropdown-item" href="#">Detail</NavLink></li>
+                                                    <li><a className="dropdown-item" onClick={() => hapus(data.id)} href="#">Hapus</a></li>
+                                                </ul>
+
+                                            </td>
                                         </tr>
                                     ))}
 
