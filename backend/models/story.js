@@ -6,6 +6,7 @@ const Story = sequelize.define('Story', {
     title: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique:true,
     },
     author: {
         type: DataTypes.STRING,

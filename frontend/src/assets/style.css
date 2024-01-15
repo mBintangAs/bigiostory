@@ -275,12 +275,27 @@
     background: var(--dark);
     border-color: var(--primary);
 }
+
 input[type="number"]::-webkit-inner-spin-button,
 input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 input[type="number"] {
-  -moz-appearance: textfield; /* Untuk Firefox */
+    -moz-appearance: textfield;
+    /* Untuk Firefox */
+}
+
+.cursor-pointer {
+    cursor: pointer;
+
+}
+
+.top-75 {
+    top: 75% !important
+}
+
+.bg-gray {
+    background-color: var(--light);
 }

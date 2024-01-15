@@ -1,9 +1,7 @@
-import { sequelize } from "../index.js";
 import { Category } from "../category.js";
 import { Story } from "../story.js";
 import { Tag } from "../tag.js";
 import { Chapter } from "../chapter.js";
-await sequelize.sync({ force: true });
 await Category.sync({ force: true });
 await Story.sync({ force: true });
 await Tag.sync({ force: true });

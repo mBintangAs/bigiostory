@@ -9,13 +9,15 @@ import { Category } from './models/category.js'
 import { chapterRouter } from './routes/chapter.js'
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import { categoryRouter } from './routes/category.js'
 
 const app = Express()
-app.use(bodyParser.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 app.use(storyRouter)
 app.use(chapterRouter)
+app.use(categoryRouter)
 
 app.listen(process.env.APP_PORT, () => {
     console.log(`Example app listening on port ${process.env.APP_PORT}`)

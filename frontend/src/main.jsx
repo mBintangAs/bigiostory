@@ -3,18 +3,31 @@ import ReactDOM from "react-dom/client";
 import axios from "axios";
 
 import "./assets/style.css";
-import "./assets/bootstrap.min.css";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import "bootstrap/dist/js/bootstrap.min.js";
+
+
+import Swal from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import { createBrowserRouter, Navigate, RouterProvider } from "react-router-dom";
+
 import Home from "./pages/Home";
 import Error from "./pages/Error";
 import Story from "./pages/Story";
 
 
-// axios.defaults.headers.common['Authorization'] ='Bearer ' + localStorage.getItem('key')
-axios.defaults.baseURL = 'http://localhost:3000/';
+axios.defaults.baseURL = 'http://localhost:3000';
+export const MySwal = withReactContent(Swal)
+
 const router = createBrowserRouter([
   {
-    path:'/',
+    path: "/",
+    element: <Navigate to={'/story'} />,
+    errorElement: <Error />,
+  },
+  {
     element:<Home/>,
     errorElement: <Error />,
     children: [

@@ -24,13 +24,7 @@ export default function Navbar({setSearch}) {
         <div style={{ backgroundColor:"transparent" }} className="sidebar-toggler flex-shrink-0">
           <i className="fa fa-bars" />
         </div>
-          <input
-            className="form-control border-0"
-            type="search"
-            onChange={e=>setSearch(e.target.value)}
-            placeholder="Search"
-          />
-       
+        
       </nav>
       {/* Navbar End */}
     </>

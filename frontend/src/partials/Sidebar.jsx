@@ -10,9 +10,9 @@ return (
         </div>
 
         <div className="navbar-nav w-100">
-          <NavLink to={'/books'} activeclassname="active" className="nav-item nav-link mb-3">
-            <i className="fas fa-clipboard-list me-2"></i>
-            Buku
+          <NavLink to={'/story'} activeclassname="active" className="nav-item nav-link mb-3">
+            <i className="fas fa-clipboard-list"></i>
+            Manajemen Story
           </NavLink>
 
         </div>
