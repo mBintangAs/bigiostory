@@ -17,6 +17,7 @@ import Home from "./pages/Home";
 import Error from "./pages/Error";
 import Story from "./pages/Story";
 import ActionStory from "./pages/ActionStory";
+import ActionChapter from "./pages/ActionChapter";
 
 
 axios.defaults.baseURL = 'http://localhost:3000';
@@ -85,8 +86,20 @@ const router = createBrowserRouter([
         element: <ActionStory />,
       },
       {
+        path: "/edit/:judul",
+        element: <ActionStory />,
+      },
+      {
         path: "/detail/:judul",
         element: <ActionStory />,
+      },
+      {
+        path: "/chapter/:judul",
+        element: <ActionChapter />,
+      },
+      {
+        path: "/chapter/:judul/:id",
+        element: <ActionChapter />,
       },
     ]
   },

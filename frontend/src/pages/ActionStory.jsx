@@ -1,6 +1,6 @@
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom"
 import CreatableSelect from 'react-select/creatable';
-import { MySwal, fetchData, postData } from "../main";
+import { MySwal, deleteData, fetchData, postData } from "../main";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 
@@ -18,13 +18,16 @@ export default function ActionStory() {
     const location = useLocation();
     const [isDisabled, setIsDisabled] = useState(false)
     const { judul } = useParams();
-
+    const [pagename, setPageName] = useState(formatPathToLabel(location.pathname));
+    const [chapter, setChapter] = useState('')
 
 
     useEffect(() => {
         const load = async () => {
             await fetchData('/category', setCategory)
-            if (formatPathToLabel(location.pathname) == 'Detail') {
+            await fetchData('/chapter?judul=' + judul, setChapter)
+            console.log(chapter);
+            if (pagename == 'Detail') {
                 setIsDisabled(true)
                 await fetchData('/story/' + judul, (e) => {
                     setTitle(e.title)
@@ -35,15 +38,32 @@ export default function ActionStory() {
                     const tagObjects = e.Tags.map(tag => ({ label: tag.name }));
                     setTags(tagObjects);
                     setStoryCover(e.storyCover)
-                    console.log(tagObjects);
+                })
+            }
+            if (pagename == 'Edit') {
+                await fetchData('/story/' + judul, (e) => {
+                    setTitle(e.title)
+                    setAuthor(e.author)
+                    setSynopsis(e.synopsis)
+                    setCategorySelected(e.categoryId)
+                    setStatus(e.status)
+                    const tagObjects = e.Tags.map(tag => ({ label: tag.name }));
+                    setTags(tagObjects);
+                    setStoryCover(e.storyCover)
                 })
             }
         }
         load()
     }, [])
-    async function tambahSubmit(e) {
+    async function submit(e) {
         e.preventDefault()
-        console.log(tags);
+        if (storyCover === null) {
+            return MySwal.fire({
+                title: "Silahkan memasukkan gambar cover",
+                icon: "warning",
+                showConfirmButton: true
+            })
+        }
         if (categorySelected === '') {
             return MySwal.fire({
                 title: "Silahkan memilih kategori",
@@ -66,7 +86,7 @@ export default function ActionStory() {
             })
         }
         let tag = []
-        tags.map((e) => tag.push(e.value))
+        tags.map((e) => tag.push(pagename === 'Tambah' ? e.value : e.label))
         const formData = new FormData();
         formData.append('title', title);
         formData.append('author', author);
@@ -75,14 +95,20 @@ export default function ActionStory() {
         formData.append('categoryId', categorySelected);
         formData.append('storyCover', storyCover);
         formData.append('tags', JSON.stringify(tag));
-
-        await postData('/story', formData, (item) => {
+        let url;
+        if (pagename === 'Edit') {
+            url = '/story-edit'
+        }
+        if (pagename === 'Tambah') {
+            url = '/story'
+        }
+        await postData(url, formData, (item) => {
             MySwal.fire({
                 title: item.message,
                 icon: "success",
                 showConfirmButton: true
             })
-            navigate(`/story/`)
+            navigate(`/story`)
         });
 
 
@@ -121,22 +147,49 @@ export default function ActionStory() {
         setStoryCover(selectedFile)
     }
     function formatPathToLabel(path) {
-        // Menghapus karakter garis miring awal dan mengganti dengan huruf kapital
         const detail = path.split("/");
         return detail[1].charAt(0).toUpperCase() + detail[1].slice(1);
     }
+    function formatDateAddHours(dateString, hoursToAdd) {
+        let date = new Date(dateString);
+        date.setHours(date.getHours() + hoursToAdd);
+        return date.toLocaleString("id-ID", { day: 'numeric', month: 'long', year: 'numeric' });
+    }
+    async function deleteChapter(id) {
+        MySwal.fire({
+            title: 'Apakah  yakin untuk menghapus ? ',
+            text: 'Aksi ini tidak dapat di kembalikan',
+            icon: 'danger',
+            showCancelButton: true,
+            cancelButtonColor: "red",
+            confirmButtonColor: 'blue',
+            confirmButtonText: 'Ya, Saya Setuju'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                await deleteData('/chapter?id=' + id, (item) => {
+                    MySwal.fire({
+                        title: item.message,
+                        icon: "success",
+                        showConfirmButton: true
+                    })
+                    fetchData('/chapter?judul=' + judul, setChapter)
+                });
+
+            }
+        });
+    }
     return (
         <>
-            <form onSubmit={tambahSubmit} >
+            <form onSubmit={submit} >
                 <div className="container-fluid pt-4 px-4">
                     <div className="col-12  p-4">
                         <nav aria-label="breadcrumb">
                             <ol className="breadcrumb">
                                 <NavLink activeclassname="text-primary" onClick={cancel} className="breadcrumb-item">List Cerita</NavLink>
-                                <NavLink activeclassname="text-primary" to={location.pathname} className="breadcrumb-item">{formatPathToLabel(location.pathname)} Cerita</NavLink>
+                                <NavLink activeclassname="text-primary" to={location.pathname} className="breadcrumb-item">{pagename} Cerita</NavLink>
                             </ol>
                         </nav>
-                        <h1 className="">{formatPathToLabel(location.pathname)} Cerita</h1>
+                        <h1 className="">{pagename} Cerita</h1>
 
                         <div className="card">
 
@@ -205,8 +258,8 @@ export default function ActionStory() {
                                 </div>
                                 <div className="row mb-3">
 
-                                    <div className={"col-6"+isDisabled&&'d-none'}>
-                                        <input required type="file" accept="image/*" ref={fileInputRef} className='form-control' onChange={handleFileChange} />
+                                    <div className={"col-6"}>
+                                        <input type="file" disabled={isDisabled} accept="image/*" ref={fileInputRef} className='form-control' onChange={handleFileChange} />
                                     </div>
                                     <div className="col-6 ">
                                         <select disabled={isDisabled} className="form-select" id="categorySelect" value={status} onChange={(e) => setStatus(e.target.value)} aria-label="">
@@ -218,11 +271,54 @@ export default function ActionStory() {
 
                                 </div>
                                 <div className="row">
-                                    <img src={axios.defaults.baseURL+'/images/'+storyCover} alt="" />
+                                    <img src={axios.defaults.baseURL + '/images/' + storyCover} alt="" />
                                 </div>
                             </div>
-
                         </div>
+                        {
+                            pagename !== 'Tambah' &&
+                            (<div className="card">
+                                <div className="card-header">
+                                    {!isDisabled && (
+                                        <div className="row justify-content-end" >
+                                            <NavLink to={'/chapter/' + title} className="btn btn-primary w-25" >Add Chapter</NavLink>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="card-body">
+                                    <div className="table-responsive">
+                                        <table className="table">
+                                            <thead>
+                                                <tr>
+                                                    <td>Title</td>
+                                                    <td>Last Update</td>
+                                                    {!isDisabled && (
+                                                        <td>Action</td>
+                                                    )}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {chapter && chapter.map((e) => (
+                                                    <tr className="w-100" key={e.id} >
+                                                        <td>{e.title}</td>
+                                                        <td>{formatDateAddHours(e.updatedAt, 7)}</td>
+                                                        {!isDisabled &&
+                                                            (<td>
+                                                                <i className="fa-solid fa-ellipsis " type="button" data-bs-toggle="dropdown" aria-expanded="false"></i>
+                                                                <ul className="dropdown-menu">
+                                                                    <li><NavLink to={`/chapter/${judul}/${e.id}`} className="dropdown-item" href="#">Edit</NavLink></li>
+                                                                    <li><div className="dropdown-item" onClick={() => deleteChapter(e.id)}>Delete</div></li>
+                                                                </ul>
+                                                            </td>)
+                                                        }
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>)
+                        }
                     </div>
                     <div className="row justify-content-end gap-1 my-3">
                         <div className="btn btn-secondary w-25" onClick={cancel}>Cancel</div>

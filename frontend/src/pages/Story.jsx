@@ -12,7 +12,6 @@ export default function Story() {
     const [categoryFilter, setCategoryFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
 
-
     useEffect(() => {
         const load = async () => {
             await fetchData('/story', setCerita);
@@ -48,17 +47,7 @@ export default function Story() {
     const filter = () => {
         fetchData(`/story?query=${query}&category=${categoryFilter}&status=${statusFilter}`, setCerita);
     }
-    const hapus = async (id) => {
-        console.log(id);
-        await deleteData('/story?id=' + id, async (item) => {
-            MySwal.fire({
-                title: item.message,
-                icon: "success",
-                showConfirmButton: true
-            })
-            await fetchData('/story', setCerita)
-        })
-    }
+
 
     return (
         <>
@@ -154,7 +143,6 @@ export default function Story() {
                                                 <ul className="dropdown-menu">
                                                     <li><NavLink to={`/edit/${data.title}`} className="dropdown-item" href="#">Edit</NavLink></li>
                                                     <li><NavLink to={`/detail/${data.title}`} className="dropdown-item" href="#">Detail</NavLink></li>
-                                                    <li><a className="dropdown-item" onClick={() => hapus(data.id)} href="#">Hapus</a></li>
                                                 </ul>
 
                                             </td>

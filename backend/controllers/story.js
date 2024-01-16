@@ -1,13 +1,9 @@
 import { Category } from "../models/category.js";
-import { Chapter } from "../models/chapter.js";
 import { Story } from "../models/story.js"
 import { Tag } from "../models/tag.js";
 import { Op } from "sequelize";
 import multer from 'multer';
 import { storage } from "../app.js";
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { unlink } from "fs/promises";
 
 export const index = async (req, res) => {
   try {
@@ -50,7 +46,6 @@ export const index = async (req, res) => {
   }
 };
 
-
 export const store = async (req, res) => {
   try {
     const upload = multer({ storage });
@@ -89,8 +84,6 @@ export const store = async (req, res) => {
 
 export const show = async (req, res) => {
   try {
-
-
     const stories = await Story.findOne({
       include: [
         { model: Category },
@@ -107,44 +100,43 @@ export const show = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const { id, title, author, synopsis, storyCover, status, categoryId, tags } = req.body;
+    const upload = multer({ storage });
+    // Gunakan 'upload.single' untuk menangani file upload
+    upload.single('storyCover')(req, res, async function (err) {
+      if (err instanceof multer.MulterError) {
+        return res.status(400).json({ error: 'Multer Error' });
+      } else if (err) {
+        return res.status(500).json({ error: 'Internal Server Error' });
+      }
 
-    const newStory = await Story.update({
-      title,
-      author,
-      synopsis,
-      storyCover,
-      status,
-      categoryId,
-    }, { where: { id } });
+      const { title, author, synopsis, status, categoryId, tags } = req.body;
 
-    if (tags && tags.length > 0) {
-      const storyTags = tags.map(tagName => ({ name: tagName, storyId: newStory.id }));
-      await Tag.bulkCreate(storyTags, { updateOnDuplicate: ["name"] });
-    }
-    return res.json({ message: "Data berhasil diperbarui" })
+      const story = await Story.findOne({ where: { title } });
+      const storyCover = req.file ? req.file.filename : story.storyCover;
 
+      const newStory = await Story.update({
+        title,
+        author,
+        synopsis,
+        storyCover,
+        status,
+        categoryId,
+      }, { where: { title } });
+
+      const parsedTags = JSON.parse(tags);
+      console.log(parsedTags);
+      if (tags && tags.length > 0) {
+        await Tag.destroy({ where: { storyId: story.id } })
+        const storyTags = parsedTags.map(tagName => ({ name: tagName, storyId: story.id }));
+        await Tag.bulkCreate(storyTags);
+      }
+
+      return res.json({ message: "Data berhasil diperbarui" })
+    });
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
 
-export const destroy = async (req, res) => {
-  try {
-    const { id } = req.query;
-    const story = await Story.findOne({ where: { id } })
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    await unlink(path.join(__dirname, '../images/', story.storyCover))
-    await Chapter.destroy({ where: { storyId: id } });
-    await Tag.destroy({ where: { storyId: id } })
-    await story.destroy();
-    // await Story.destroy({ where: { id } });
-    return res.json({ message: "Data berhasil dihapus" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-}
 
 
