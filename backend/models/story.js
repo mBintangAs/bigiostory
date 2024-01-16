@@ -1,4 +1,3 @@
-// story.js
 import { DataTypes } from 'sequelize';
 import { sequelize } from './index.js'; // Sesuaikan dengan instance Sequelize Anda
 
@@ -18,7 +17,7 @@ const Story = sequelize.define('Story', {
     },
   
     storyCover: {
-        type: DataTypes.STRING, // Gunakan tipe data yang sesuai untuk menyimpan path/gambar
+        type: DataTypes.STRING, 
         allowNull: false,
     },
     status: {

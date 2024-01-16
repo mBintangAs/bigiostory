@@ -17,7 +17,6 @@ export default function ActionChapter() {
             const checkPage = location.pathname.split('/')[3];
             setPageName(checkPage ? 'Edit' : 'Tambah')
             if (checkPage) {
-                console.log(location.pathname.split('/')[3]);
                 await fetchData('/chapter/'+location.pathname.split('/')[3],(item)=>{
                     setTitle(item.title);
                     setStoryChapter(item.storyChapter);
@@ -38,7 +37,6 @@ export default function ActionChapter() {
             confirmButtonText: 'Ya, Saya Setuju'
         }).then((result) => {
             if (result.isConfirmed) {
-                console.log(judul);
                 navigate('/edit/' + judul)
             }
         });

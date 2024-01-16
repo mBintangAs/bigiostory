@@ -3,20 +3,13 @@ import { useEffect } from "react";
 export default function Navbar({setSearch}) {
   useEffect(() => {
     const handleSidebarToggle = () => {
-      // Logika penanganan event listener di sini
-      // Contoh: Toggle kelas di beberapa elemen
       document.querySelector(".sidebar").classList.toggle("open");
       document.querySelector(".content").classList.toggle("open");
     };
-
-    // Menambahkan event listener ke elemen dengan kelas 'sidebar-toggler'
     document
       .querySelector(".sidebar-toggler")
       .addEventListener("click", handleSidebarToggle);
-
-   
-  }, []); // Dependency array kosong agar useEffect hanya berjalan sekali saat komponen dipasang
-
+  }, []); 
   return (
     <>
       {/* Navbar Start */}

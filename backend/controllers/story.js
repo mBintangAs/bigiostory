@@ -7,9 +7,7 @@ import { storage } from "../app.js";
 
 export const index = async (req, res) => {
   try {
-    let whereClause = {}; // Persiapkan klausa WHERE kosong
-
-    // Cek apakah ada parameter pencarian
+    let whereClause = {}; 
     if (req.query.query) {
       const query = req.query.query;
       whereClause = {
@@ -20,12 +18,10 @@ export const index = async (req, res) => {
       };
     }
 
-    // Cek apakah ada parameter kategori
     if (req.query.category) {
       whereClause.categoryId = req.query.category;
     }
 
-    // Cek apakah ada parameter status
     if (req.query.status) {
       whereClause.status = req.query.status;
     }
@@ -49,7 +45,6 @@ export const index = async (req, res) => {
 export const store = async (req, res) => {
   try {
     const upload = multer({ storage });
-    // Gunakan 'upload.single' untuk menangani file upload
     upload.single('storyCover')(req, res, async function (err) {
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ error: 'Multer Error' });
@@ -58,8 +53,7 @@ export const store = async (req, res) => {
       }
 
       const { title, author, synopsis, status, categoryId, tags } = req.body;
-      const storyCover = req.file.filename; // Ambil nama file dari req.file
-
+      const storyCover = req.file.filename;
       const newStory = await Story.create({
         title,
         author,
@@ -101,7 +95,6 @@ export const show = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const upload = multer({ storage });
-    // Gunakan 'upload.single' untuk menangani file upload
     upload.single('storyCover')(req, res, async function (err) {
       if (err instanceof multer.MulterError) {
         return res.status(400).json({ error: 'Multer Error' });

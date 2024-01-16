@@ -25,8 +25,7 @@ export default function ActionStory() {
     useEffect(() => {
         const load = async () => {
             await fetchData('/category', setCategory)
-            await fetchData('/chapter?judul=' + judul, setChapter)
-            console.log(chapter);
+
             if (pagename == 'Detail') {
                 setIsDisabled(true)
                 await fetchData('/story/' + judul, (e) => {
@@ -51,6 +50,10 @@ export default function ActionStory() {
                     setTags(tagObjects);
                     setStoryCover(e.storyCover)
                 })
+            }
+            if (pagename !== 'Tambah') {
+                await fetchData('/chapter?judul=' + judul, setChapter)
+
             }
         }
         load()
